@@ -14,7 +14,7 @@ const fs = require('fs');
 const app = express();
 
 const salt = bcrypt.genSaltSync(10);
-app.use(cors({ credentials: true, origin: 'https://ds-blogs-livid.vercel.app/' }));
+app.use(cors({ credentials: true, origin: 'https://ds-blogs-livid.vercel.app' }));
 app.use(express.json());
 app.use(cookieParser());
 app.use('/uploads', express.static(__dirname + '/uploads'));
