@@ -7,7 +7,7 @@ export default function Post({ title, summary, content, cover, createdAt, author
         <div className="post">
             <div className="image">
                 <Link to={`/post/${_id}`}>
-                    <img src={'http://localhost:4000/' + cover} alt="nothing" />
+                    <img src={'https://ds-blogs-server.vercel.app/' + cover} alt="nothing" />
                 </Link>
             </div>
             <div className="texts">
