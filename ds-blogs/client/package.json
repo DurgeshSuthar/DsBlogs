@@ -34,7 +34,7 @@
       "not dead",
       "not op_mini all"
     ],
-    "Proxy":"https://ds-blogs-api.onrender.com",
+    "proxy":"https://ds-blogs-api.onrender.com",
     "development": [
       "last 1 chrome version",
       "last 1 firefox version",
