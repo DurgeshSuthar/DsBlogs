@@ -5,7 +5,7 @@ import { UserContext } from "./UserContext";
 export default function Header() {
   const { setUserInfo, userInfo } = useContext(UserContext);
   useEffect(() => {
-    fetch(`/profile`, {
+    fetch(`https://ds-blogs-api.onrender.com/profile`, {
       credentials: 'include',
     }).then(response => {
       response.json().then(userInfo => {
@@ -15,7 +15,7 @@ export default function Header() {
   }, []);
 
   function logout() {
-    fetch('/logout', {
+    fetch('https://ds-blogs-api.onrender.com/logout', {
       credentials: 'include',
       method: 'POST',
     });
