@@ -7,7 +7,7 @@ export default function Post({ title, summary, content, cover, createdAt, author
         <div className="post">
             <div className="image">
                 <Link to={`/post/${_id}`}>
-                    <img src={'/' + cover} alt="nothing" />
+                    <img src={'https://ds-blogs-api.onrender.com/' + cover} alt="nothing" />
                 </Link>
             </div>
             <div className="texts">
