@@ -83,6 +83,7 @@ app.post('/post', uploadMiddleware.single('file'), async (req, res) => {
     const ext = parts[parts.length - 1];
     const newPath = path + '.' + ext;
     const { token } = req.cookies;
+    console.log(token);
     if (!token) return res.status(401).json({ error: 'Authentication failed. Please log in to create a post.' });
     else {
         fs.renameSync(path, newPath);
