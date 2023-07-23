@@ -11,7 +11,7 @@ export default function LoginPage() {
     const { setUserInfo } = useContext(UserContext);
     async function login(ev) {
         ev.preventDefault();
-        const response = await fetch('/login', {
+        const response = await fetch('https://ds-blogs-api.onrender.com/login', {
             method: 'POST',
             body: JSON.stringify({ username, password }),
             headers: { 'Content-Type': 'application/json' },
