@@ -4,7 +4,7 @@ import Post from "../Post";
 export default function IndexPage() {
     const [posts, setPosts] = useState([]);
     useEffect(() => {
-        fetch('https://ds-blogs-server.vercel.app/post').then(response => {
+        fetch('/post').then(response => {
             response.json().then(posts => {
                 setPosts(posts);
             });
