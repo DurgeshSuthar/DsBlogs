@@ -10,7 +10,7 @@ export default function RegisterPage() {
     const { setUserInfo } = useContext(UserContext);
     async function register(ev) {
         ev.preventDefault();
-        const response = await fetch(`/register`, {
+        const response = await fetch(`https://ds-blogs-api.onrender.com/register`, {
             method: 'POST',
             body: JSON.stringify({ username, password }),
             headers: { 'Content-Type': 'application/json' },
