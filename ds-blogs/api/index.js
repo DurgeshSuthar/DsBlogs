@@ -83,8 +83,6 @@ app.post('/post', uploadMiddleware.single('file'), async (req, res) => {
     const ext = parts[parts.length - 1];
     const newPath = path + '.' + ext;
     const { token } = req.cookies;
-    if (!token) return res.status(401).json({ error: 'Authentication failed. Please log in to create a post.' });
-    else {
         fs.renameSync(path, newPath);
         jwt.verify(token, secret, {}, async (err, info) => {
             if (err) throw err;
@@ -98,7 +96,6 @@ app.post('/post', uploadMiddleware.single('file'), async (req, res) => {
             });
             res.json(postDoc);
         });
-    }
 
 });
 
