@@ -9,7 +9,7 @@ export default function PostPage() {
     const { userInfo } = useContext(UserContext);
     const { id } = useParams();
     useEffect(() => {
-        fetch(`https://ds-blogs-server.vercel.app/${id}`).then(response => {
+        fetch(`/${id}`).then(response => {
             response.json().then(postInfo => {
                 setPostInfo(postInfo);
             });
@@ -33,7 +33,7 @@ export default function PostPage() {
                 </div>
             )}
             <div className="image">
-                <img src={`https://ds-blogs-server.vercel.app/${postInfo.cover}`} alt="" />
+                <img src={`/${postInfo.cover}`} alt="" />
             </div>
             <div className="content" dangerouslySetInnerHTML={{ __html: postInfo.content }} />
         </div>
