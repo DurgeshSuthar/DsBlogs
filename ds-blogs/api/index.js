@@ -89,7 +89,7 @@ app.post('/post', uploadMiddleware.single('file'), async (req, res) => {
     const b64 = Buffer.from(req.file.buffer).toString('base64');
     const dataURI = "data:" + req.file.mimetype + ";base64," + b64;
     const { token } = req.cookies;
-    if (!token) return res.status(401).json({ error: 'Authentication failed. Please log in to create a post.' });
+    if (!token) return res.status(401).json(token);
     else {
         try{
             const result = await cloudinary.uploader.upload(dataURI);
