@@ -34,11 +34,17 @@ app.post('/register', async (req, res) => {
             username,
             password: bcrypt.hashSync(password, salt),
         });
+        const options={
+                httpOnly:true,
+                secure: true,
+                sameSite:'None',
+            };  
         jwt.sign({ username, id: userDoc._id }, secret, {}, (err, token) => {
             if (err) throw err;
-            res.cookie('token', token).json({
+            res.cookie('token', token, options).json({
                 id: userDoc._id,
                 username,
+                token,
             });
         });
     }
