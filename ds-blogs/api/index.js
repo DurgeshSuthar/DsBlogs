@@ -58,6 +58,7 @@ app.post('/login', async (req, res) => {
             const options={
                 httpOnly:true,
                 secure: true,
+                sameSite:'None',
             };  
             jwt.sign({ username, id: userDoc._id }, secret, {}, (err, token) => {
                 if (err) throw err;
