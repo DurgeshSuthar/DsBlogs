@@ -7,10 +7,12 @@ const jwt = require('jsonwebtoken');
 const secret = 'ufzeruwjgwiu56g';
 const cookieParser = require('cookie-parser');
 const multer = require('multer');
-const uploadMiddleware = multer({ dest: 'uploads/' });
+const storage = multer.memoryStorage();
+const uploadMiddleware = multer({ storage });
 const Post = require('./models/Post');
 const fs = require('fs');
-
+require("dotenv").config();
+const cloudinary = require('cloudinary').v2;
 const app = express();
 
 const salt = bcrypt.genSaltSync(10);
@@ -18,7 +20,12 @@ app.use(cors({ credentials: true, origin: 'https://ds-blogs-livid.vercel.app' })
 app.use(express.json());
 app.use(cookieParser());
 app.use('/uploads', express.static(__dirname + '/uploads'));
-mongoose.connect('mongodb+srv://captain:jacksparrow@cluster0.trorbhp.mongodb.net/?retryWrites=true&w=majority').then(response => console.log("connected"));
+mongoose.connect(process.env.MONGO_URI);
+cloudinary.config({ 
+    cloud_name: process.env.CLOUD_NAME, 
+    api_key: process.env.API_KEY, 
+    api_secret: process.env.API_SECRET 
+  });
 
 app.post('/register', async (req, res) => {
     const { username, password } = req.body;
@@ -78,27 +85,30 @@ app.post('/logout', (req, res) => {
 })
 
 app.post('/post', uploadMiddleware.single('file'), async (req, res) => {
-    const { originalname, path } = req.file;
-    const parts = originalname.split('.');
-    const ext = parts[parts.length - 1];
-    const newPath = path + '.' + ext;
+    const b64 = Buffer.from(req.file.buffer).toString('base64');
+    const dataURI = "data:" + req.file.mimetype + ";base64," + b64;
     const { token } = req.cookies;
-    console.log(token);
     if (!token) return res.status(401).json({ error: 'Authentication failed. Please log in to create a post.' });
     else {
-        fs.renameSync(path, newPath);
-        jwt.verify(token, secret, {}, async (err, info) => {
-            if (err) throw err;
-            const { title, summary, content } = req.body;
-            const postDoc = await Post.create({
-                title,
-                summary,
-                content,
-                cover: newPath,
-                author: info.id,
+        try{
+            const result = await cloudinary.uploader.upload(dataURI);
+            jwt.verify(token, secret, {}, async (err, info) => {
+                if (err) throw err;
+                const { title, summary, content } = req.body;
+                const postDoc = await Post.create({
+                    title,
+                    summary,
+                    content,
+                    cover: result.secure_url,
+                    author: info.id,
+                });
+                res.json(postDoc);
             });
-            res.json(postDoc);
-        });
+        }
+        catch(err){
+            console.log(err);
+            res.status(401).json('Unable to upload image, Please try again!');
+        }
     }
 });
 
@@ -113,36 +123,35 @@ app.get('/post/:id', async (req, res) => {
 })
 
 app.put('/post', uploadMiddleware.single('file'), async (req, res) => {
-    let newPath = null;
-    if (req.file) {
-        const { originalname, path } = req.file;
-        const parts = originalname.split('.');
-        const ext = parts[parts.length - 1];
-        newPath = path + '.' + ext;
-        fs.renameSync(path, newPath);
-    }
+    const b64 = Buffer.from(req.file.buffer).toString('base64');
+    const dataURI = "data:" + req.file.mimetype + ";base64," + b64;
     const { token } = req.cookies;
     if (!token) return res.status(401).json({ error: 'Authentication failed. Please log in to edit a post.' });
     else {
-        jwt.verify(token, secret, {}, async (err, info) => {
-            if (err) throw err;
-            const { title, summary, content, id } = req.body;
-            const postDoc = await Post.findById(id);
-            const isAuthor = JSON.stringify(postDoc.author) === JSON.stringify(info.id);
-            if (!isAuthor) {
-                return res.status(400).json('you are not the author');
-            }
-
-            await postDoc.updateOne({
-                title,
-                summary,
-                content,
-                cover: newPath ? newPath : postDoc.cover,
+        try{
+            const result = await cloudinary.uploader.upload(dataURI);
+            jwt.verify(token, secret, {}, async (err, info) => {
+                if (err) throw err;
+                const { title, summary, content, id } = req.body;
+                const postDoc = await Post.findById(id);
+                const isAuthor = JSON.stringify(postDoc.author) === JSON.stringify(info.id);
+                if (!isAuthor) {
+                    return res.status(400).json('you are not the author');
+                }
+                await postDoc.updateOne({
+                    title,
+                    summary,
+                    content,
+                    cover: result.secure_url,
+                });
+                res.json(postDoc);
             });
-
-            res.json(postDoc);
-        });
+        }
+        catch(err){
+            res.status(400).json('Unable to edit the post');
+        }
+        
     }
 })
-// mongodb+srv://captain:jacksparrow@cluster0.trorbhp.mongodb.net/?retryWrites=true&w=majority
+
 app.listen(4000);
