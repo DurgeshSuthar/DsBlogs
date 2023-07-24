@@ -9,7 +9,7 @@ export default function PostPage() {
     const { userInfo } = useContext(UserContext);
     const { id } = useParams();
     useEffect(() => {
-        fetch(`https://ds-blogs-api.onrender.com/${id}`).then(response => {
+        fetch(`https://ds-blogs-api.onrender.com/post/${id}`).then(response => {
             response.json().then(postInfo => {
                 setPostInfo(postInfo);
             });
