@@ -27,6 +27,12 @@ cloudinary.config({
     api_secret: process.env.API_SECRET 
   });
 
+const options={
+                httpOnly:true,
+                secure: true,
+                sameSite:'None',
+            }; 
+
 app.post('/register', async (req, res) => {
     const { username, password } = req.body;
     try {
@@ -34,11 +40,6 @@ app.post('/register', async (req, res) => {
             username,
             password: bcrypt.hashSync(password, salt),
         });
-        const options={
-                httpOnly:true,
-                secure: true,
-                sameSite:'None',
-            };  
         jwt.sign({ username, id: userDoc._id }, secret, {}, (err, token) => {
             if (err) throw err;
             res.cookie('token', token, options).json({
@@ -61,11 +62,6 @@ app.post('/login', async (req, res) => {
         const passOk = bcrypt.compareSync(password, userDoc.password);
         if (passOk) {
             //logged in
-            const options={
-                httpOnly:true,
-                secure: true,
-                sameSite:'None',
-            };  
             jwt.sign({ username, id: userDoc._id }, secret, {}, (err, token) => {
                 if (err) throw err;
                 res.cookie('token', token, options).json({
@@ -93,7 +89,7 @@ app.get('/profile', (req, res) => {
 });
 
 app.post('/logout', (req, res) => {
-    res.cookie('token', '').json('ok');
+    res.cookie('token',null, options).json('ok');
 })
 
 app.post('/post', uploadMiddleware.single('file'), async (req, res) => {
