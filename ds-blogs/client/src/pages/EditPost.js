@@ -1,6 +1,7 @@
 import {useEffect, useState} from 'react';
 import Editor from '../Editor';
 import { Navigate, useParams } from 'react-router-dom';
+import loading from "../loading.gif";
 
 export default function EditPost() {
     const {id} = useParams();
@@ -10,6 +11,7 @@ export default function EditPost() {
     const [files, setFiles] = useState('');
     const [redirect, setRedirect] = useState(false);
     const [authFail, setAuthFail] = useState(false);
+     const [load, setLoad] = useState(false);
 
     useEffect(() => {
         fetch('https://ds-blogs-api.onrender.com/post/'+id).then(response => {
@@ -21,6 +23,7 @@ export default function EditPost() {
         });
     },[]);
     async function updatePost(ev) {
+        setLoad(true);
         ev.preventDefault();
         const data = new FormData();
         data.set('title', title);
@@ -35,7 +38,7 @@ export default function EditPost() {
             body: data,
             credentials: 'include',
         });
-        
+        setLoad(false);
         if(response.ok){
             setRedirect(true);
         }
@@ -52,12 +55,27 @@ export default function EditPost() {
         return <Navigate to={'/post/'+id} />;
     }
     return (
-        <form onSubmit={updatePost}>
-            <input type="title" placeholder={"Title"} value={title} onChange={ev => setTitle(ev.target.value)} required/>
-            <input type="summary" placeholder={'Summary'} value={summary} onChange={ev => setSummary(ev.target.value)} required/>
-            <input type="file" onChange={ev => setFiles(ev.target.files)} required/>
-            <Editor onChange={setContent} value={content} />
-            <button style={{marginTop: '5px'}}>Edit Post</button>
-        </form>
+         <>
+            {load && (
+                <>
+                    <br />
+                    <br />
+                    <br />
+                    <br />
+                    <div className="spin">
+                        <img src={loading} alt="Loading..." />
+                    </div>
+                </>
+            )}
+            {!load && (
+                <form onSubmit={updatePost}>
+                    <input type="title" placeholder={"Title"} value={title} onChange={ev => setTitle(ev.target.value)} required />
+                    <input type="summary" placeholder={'Summary'} value={summary} onChange={ev => setSummary(ev.target.value)} required />
+                    <input type="file" onChange={ev => setFiles(ev.target.files)} required />
+                    <Editor onChange={setContent} value={content} />
+                    <button style={{ marginTop: '5px' }}>Edit Post</button>
+                </form>
+            )}
+        </>
     );
 }
