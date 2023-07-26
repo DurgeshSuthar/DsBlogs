@@ -3,6 +3,7 @@ import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import { Navigate } from 'react-router-dom';
 import Editor from '../Editor';
+import loading from "../loading.gif";
 
 export default function CreatePost() {
     const [title, setTitle] = useState('');
@@ -11,8 +12,10 @@ export default function CreatePost() {
     const [files, setFiles] = useState('');
     const [redirect, setRedirect] = useState(false);
     const [authFail, setAuthFail] = useState(false);
+    const [load, setLoad] = useState(false);
 
     async function createNewPost(ev) {
+        setLoad(true);
         const data = new FormData();
         data.set('title', title);
         data.set('summary', summary);
@@ -24,6 +27,7 @@ export default function CreatePost() {
             body: data,
             credentials: 'include',
         });
+        setLoad(false);
         if(response.ok){
             setRedirect(true);
         }
@@ -39,12 +43,27 @@ export default function CreatePost() {
         return <Navigate to={'/login'} />;
     }
     return (
-        <form onSubmit={createNewPost}>
-            <input type="title" placeholder={"Title"} value={title} onChange={ev => setTitle(ev.target.value)} required/>
-            <input type="summary" placeholder={'Summary'} value={summary} onChange={ev => setSummary(ev.target.value)} required/>
-            <input type="file" onChange={ev => setFiles(ev.target.files)} required/>
-            <Editor value={content} onChange={setContent} />
-            <button style={{marginTop: '5px'}}>Post</button>
-        </form>
+       <>
+            {load && (
+                <>
+                <br />
+                <br />
+                <br />
+                <br />
+                <div className="spin">
+                      <img src={loading} alt="Loading..."/>
+                </div>
+              </>
+            )}
+            {!load && (
+                <form onSubmit={createNewPost}>
+                <input type="title" placeholder={"Title"} value={title} onChange={ev => setTitle(ev.target.value)} required/>
+                <input type="summary" placeholder={'Summary'} value={summary} onChange={ev => setSummary(ev.target.value)} required/>
+                <input type="file" onChange={ev => setFiles(ev.target.files)} required/>
+                <Editor value={content} onChange={setContent} />
+                <button style={{marginTop: '5px'}}>Post</button>
+            </form>
+            )}
+        </>  
     );
 }
