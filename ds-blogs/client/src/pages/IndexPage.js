@@ -9,6 +9,7 @@ export default function IndexPage() {
         fetch('https://ds-blogs-api.onrender.com/post').then(response => {
             response.json().then(posts => {
                 setPosts(posts);
+                setLoad(false);
             });
         });
     }, []);
