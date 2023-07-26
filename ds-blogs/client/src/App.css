@@ -213,3 +213,12 @@ p.error-message {
 p.error-message svg{
   height:20px;
 }
+
+div.spin{
+  display: flex;
+  justify-content:center;
+}
+div.spin img{
+  height:250px;
+  width: 200px;
+}
